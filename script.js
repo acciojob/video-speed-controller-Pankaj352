@@ -1,54 +1,42 @@
-const video = document.querySelector('.viewer');
-const playButton = document.querySelector('.toggle');
-const volumeSlider = document.querySelector('input[name="volume"]');
-const speedSlider = document.querySelector('input[name="playbackSpeed"]');
-const skipButtons = document.querySelectorAll('[data-skip]');
-const progress = document.querySelector('.progress');
-const progressBar = document.querySelector('.progress__filled');
-
-// Function to toggle play/pause
-function togglePlay() {
+const video = document.querySelector('.player__video');
+  const toggle = document.querySelector('.toggle');
+  const volume = document.querySelector('.volume');
+  const rewind = document.querySelector('.rewind');
+  const forward = document.querySelector('.forward');
+  const speed = document.querySelector('.speed');
+  const speedBar = document.querySelector('.speed-bar');
+  
+  function togglePlay() {
     if (video.paused) {
-        video.play();
-        playButton.textContent = '❚ ❚'; // Pause symbol
+      video.play();
+      toggle.textContent = '❚ ❚';
     } else {
-        video.pause();
-        playButton.textContent = '►'; // Play symbol
+      video.pause();
+      toggle.textContent = '►';
     }
-}
+  }
 
-// Function to update volume
-function updateVolume() {
-    video.volume = this.value;
-}
+  function updateVolume() {
+    video.volume = volume.value;
+  }
 
-// Function to update playback speed
-function updateSpeed() {
-    video.playbackRate = this.value;
-}
+  function skip(seconds) {
+    video.currentTime += seconds;
+  }
 
-// Function to skip forward or backward
-function skip() {
-    video.currentTime += parseFloat(this.dataset.skip);
-}
+  function handleSpeedChange(e) {
+    const percent = e.offsetY / speed.offsetHeight;
+    const min = 0.5;
+    const max = 2;
+    const playbackRate = percent * (max - min) + min;
+    video.playbackRate = playbackRate;
+    speedBar.style.height = ${percent * 100}%;
+    speedBar.textContent = ${playbackRate.toFixed(1)}×;
+  }
 
-// Function to update progress bar
-function updateProgress() {
-    const percent = (video.currentTime / video.duration) * 100;
-    progressBar.style.width = `${percent}%`;
-}
-
-// Function to seek video position
-function setProgress(e) {
-    const newTime = (e.offsetX / progress.offsetWidth) * video.duration;
-    video.currentTime = newTime;
-}
-
-// Event Listeners
-video.addEventListener('click', togglePlay);
-playButton.addEventListener('click', togglePlay);
-volumeSlider.addEventListener('input', updateVolume);
-speedSlider.addEventListener('input', updateSpeed);
-skipButtons.forEach(button => button.addEventListener('click', skip));
-video.addEventListener('timeupdate', updateProgress);
-progress.addEventListener('click', setProgress);
+  toggle.addEventListener('click', togglePlay);
+  video.addEventListener('click', togglePlay);
+  volume.addEventListener('input', updateVolume);
+  rewind.addEventListener('click', () => skip(-10));
+  forward.addEventListener('click', () => skip(25));
+  speed.addEventListener('mousemove', handleSpeedChange);
